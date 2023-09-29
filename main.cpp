@@ -1,6 +1,7 @@
 #include <iostream>
 #include <numeric>
 #include <iomanip>
+#include <random>
 
 using namespace std;
 
@@ -75,6 +76,20 @@ Student inputGrades(Student &student) {
     return student;
 }
 
+Student generateGrades(Student &student, int gradeCount) {
+    random_device randomDevice;
+    mt19937 gen(randomDevice());
+    uniform_int_distribution<int> distribution(1, 10);
+
+    for (int i = 0; i < gradeCount; i++) {
+        student.grades.push_back(distribution(gen));
+    }
+
+    student.examGrade = distribution(gen);
+
+    return student;
+}
+
 bool chooseAvgMdn() {
     char userChoice;
 
@@ -85,6 +100,29 @@ bool chooseAvgMdn() {
     }
 
     return toupper(userChoice) == 'A';
+}
+
+int chooseGradeInputGen() {
+    char userChoice;
+    int gradeCount = 0;
+    
+    while (toupper(userChoice) != 'Y' && toupper(userChoice) != 'N') {
+        cout << "Will you input the grades of the students yourself? Type 'Y' if yes or 'N' if you want them to be randomly generated: ";
+        cin >> userChoice;
+        cout << endl;
+    }
+
+    if (toupper(userChoice) == 'Y') {
+        return -1;
+    }
+
+    while (gradeCount < 1) {
+        cout << "You have chosen random grade generation." << endl << "Please specify how many grades should be generated for each student: ";
+        cin >> gradeCount;
+        cout << endl;
+    }
+
+    return gradeCount;
 }
 
 Student calculateAvg(Student &student) {
@@ -115,6 +153,7 @@ int main() {
     cout << endl << "If you wish to stop adding students, simply press ENTER without typing anything in when asked for a student's name." << endl << "The same rule applies to grade entering - if you entered all grades, simply press ENTER without typing anything in." << endl << endl;
 
     bool isAvg = chooseAvgMdn();
+    int gradeCount = chooseGradeInputGen();
 
     vector<Student> students;
 
@@ -127,7 +166,11 @@ int main() {
             break;
         }
 
-        student = inputGrades(student);
+        if (gradeCount > -1) {
+            student = generateGrades(student, gradeCount);
+        } else {
+            student = inputGrades(student);
+        }
 
         if (isAvg) {
             student = calculateAvg(student);
