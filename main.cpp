@@ -1,4 +1,6 @@
 #include <iostream>
+#include <numeric>
+#include <iomanip>
 
 using namespace std;
 
@@ -13,6 +15,7 @@ struct Student {
     string surname;
     array<int,gradeCount> grades;
     int examGrade;
+    float finalAvg;
 };
 
 
@@ -48,6 +51,11 @@ Student inputGrades(Student &student) {
     return student;
 }
 
+Student calculateAvg(Student &student) {
+    student.finalAvg = (accumulate(student.grades.begin(), student.grades.end(), student.finalAvg) + student.examGrade) / (student.grades.size() + 1);
+    return student;
+}
+
 
 int main() {
     int studentCount;
@@ -65,10 +73,21 @@ int main() {
 
         student = inputNameSurname(student, i);
         student = inputGrades(student);
+        student = calculateAvg(student);
 
         students[i] = student;
         cout << endl;
     }
 
-    cout << endl << "There are " << studentCount << " students." << endl;
+    cout << endl << "There are " << studentCount << " students." << endl << endl;
+
+    if (studentCount > 0) {
+        cout << left;
+        cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final grade (avg)" << endl;
+        cout << string(maxSurnameLength + maxNameLength + 20, '-') << endl;
+        
+        for (Student student : students) {
+            cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg << endl;
+        }
+    }
 }
