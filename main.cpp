@@ -5,6 +5,8 @@
 using namespace std;
 
 
+const float examWeight = 0.6;
+const float gradesWeight = 0.4;
 const int gradeCount = 3;
 const int maxStudentCount = 5;
 const int maxNameLength = 15;
@@ -16,6 +18,7 @@ struct Student {
     array<int,gradeCount> grades;
     int examGrade;
     float finalAvg;
+    float finalMdn;
 };
 
 
@@ -51,8 +54,38 @@ Student inputGrades(Student &student) {
     return student;
 }
 
+bool chooseAvgMdn() {
+    char userChoice;
+
+    while (toupper(userChoice) != 'A' && toupper(userChoice) != 'M') {
+        cout << "Please choose how the final grade should be calculated - input 'A' for average or 'M' for median: ";
+        cin >> userChoice;
+        cout << endl;
+    }
+
+    return toupper(userChoice) == 'A';
+}
+
 Student calculateAvg(Student &student) {
-    student.finalAvg = (accumulate(student.grades.begin(), student.grades.end(), student.finalAvg) + student.examGrade) / (student.grades.size() + 1);
+    student.finalAvg = ((accumulate(student.grades.begin(), student.grades.end(), student.finalAvg) / student.grades.size()) * gradesWeight) + (student.examGrade * examWeight);
+    return student;
+}
+
+Student calculateMdn(Student &student) {
+    array<int,gradeCount> sortedGrades = student.grades;
+    sort(sortedGrades.begin(), sortedGrades.end());
+    
+    int gradesCount = sortedGrades.size();
+    float medianGrade;
+
+    if (gradesCount % 2 == 0) {
+        medianGrade = (sortedGrades[(gradesCount / 2) - 1] + sortedGrades[gradesCount / 2]) / 2.0;
+    } else {
+        medianGrade = sortedGrades[gradesCount / 2];
+    }
+
+    student.finalMdn = (medianGrade * gradesWeight) + (student.examGrade * examWeight);
+
     return student;
 }
 
@@ -66,6 +99,8 @@ int main() {
         cout << endl;
     };
 
+    bool isAvg = chooseAvgMdn();
+
     Student students[studentCount];
 
     for (int i = 0; i < studentCount; i++){
@@ -73,7 +108,12 @@ int main() {
 
         student = inputNameSurname(student, i);
         student = inputGrades(student);
-        student = calculateAvg(student);
+
+        if (isAvg) {
+            student = calculateAvg(student);
+        } else {
+            student = calculateMdn(student);
+        }
 
         students[i] = student;
         cout << endl;
@@ -82,12 +122,14 @@ int main() {
     cout << endl << "There are " << studentCount << " students." << endl << endl;
 
     if (studentCount > 0) {
+        string finalGradeHeader = string("Final grade (") + (isAvg ? "avg" : "mdn") + ")";
+
         cout << left;
-        cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final grade (avg)" << endl;
+        cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << finalGradeHeader << endl;
         cout << string(maxSurnameLength + maxNameLength + 20, '-') << endl;
         
         for (Student student : students) {
-            cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg << endl;
+            cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << (isAvg ? student.finalAvg : student.finalMdn) << endl;
         }
     }
 }
