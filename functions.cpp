@@ -1,0 +1,165 @@
+#include <string>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <numeric>
+#include <iomanip>
+#include <random>
+#include <fstream>
+#include <sstream>
+
+#include "student.h"
+#include "constants.h"
+
+using namespace std;
+
+
+Student inputNameSurname(Student &student, int i) {
+    int studentNumber = i + 1;
+
+    cin.ignore();
+
+    while (student.name.length() <= 0 || student.name.length() > maxNameLength) {
+        cout << "Please enter the name of student number " << studentNumber << ": ";
+        getline(cin, student.name);
+
+        if (student.name.empty()) {
+            break;
+        }
+    }
+
+    if (student.name.empty()) {
+        return student;
+    }
+
+    while (student.surname.length() <= 0 || student.surname.length() > maxSurnameLength) {
+        cout << "Please enter the surname of student number " << studentNumber << " (name - " << student.name << "): ";
+        cin >> student.surname;
+    }
+
+    return student;
+}
+
+
+Student inputGrades(Student &student) {
+    int count = 1;
+    string input;
+
+    cin.ignore();
+
+    while (true) {
+        cout << "Please enter grade " << count << " for student " << student.name << " " << student.surname << ": ";
+        getline(cin, input);
+
+        if (input.empty()) {
+            break;
+        }
+
+        try {
+            if (stoi(input) >= 1 && stoi(input) <= 10) {
+                count++;
+                student.grades.push_back(stoi(input));
+            } else {
+                cout << "You must enter a number between 1 and 10." << endl;
+            }
+        } catch (invalid_argument&) {
+            cout << "You must enter a number between 1 and 10." << endl;
+        }
+    }
+
+    while (student.examGrade < 1 || student.examGrade > 10) {
+        cout << "Please enter the exam grade for student " << student.name << " " << student.surname << ": ";
+        
+        string input;
+        cin >> input;
+
+        try {
+            if (stoi(input) >= 1 && stoi(input) <= 10) {
+                student.examGrade = stoi(input);
+            } else {
+                student.examGrade = -1;
+                cout << "You must enter a number between 1 and 10." << endl;
+            }
+        } catch (invalid_argument&) {
+            cout << "You must enter a number between 1 and 10." << endl;
+        }
+    }
+
+    return student;
+}
+
+Student generateGrades(Student &student, int gradeCount) {
+    random_device randomDevice;
+    mt19937 gen(randomDevice());
+    uniform_int_distribution<int> distribution(1, 10);
+
+    for (int i = 0; i < gradeCount; i++) {
+        student.grades.push_back(distribution(gen));
+    }
+
+    student.examGrade = distribution(gen);
+
+    return student;
+}
+
+bool chooseInputFile() {
+    char userChoice;
+
+    while (toupper(userChoice) != 'Y' && toupper(userChoice) != 'N') {
+        cout << "Please choose whether you would like to input students by hand - input 'Y' for manual input or 'N' for file read: ";
+        cin >> userChoice;
+        cout << endl;
+    }
+
+    return toupper(userChoice) == 'Y';
+}
+
+int chooseGradeInputGen() {
+    char userChoice;
+    int gradeCount = 0;
+    
+    while (toupper(userChoice) != 'Y' && toupper(userChoice) != 'N') {
+        cout << "Will you input the grades of the students yourself? Type 'Y' if yes or 'N' if you want them to be randomly generated: ";
+        cin >> userChoice;
+        cout << endl;
+    }
+
+    if (toupper(userChoice) == 'Y') {
+        return -1;
+    }
+
+    while (gradeCount < 1) {
+        cout << "You have chosen random grade generation." << endl << "Please specify how many grades should be generated for each student: ";
+        cin >> gradeCount;
+        cout << endl;
+    }
+
+    return gradeCount;
+}
+
+bool compareStudents(Student &left, Student &right) {
+    return left.name < right.name;
+}
+
+Student calculateAvg(Student &student) {
+    student.finalAvg = ((accumulate(student.grades.begin(), student.grades.end(), student.finalAvg) / student.grades.size()) * gradesWeight) + (student.examGrade * examWeight);
+    return student;
+}
+
+Student calculateMdn(Student &student) {
+    vector<int> sortedGrades = student.grades;
+    sort(sortedGrades.begin(), sortedGrades.end());
+    
+    int gradesCount = sortedGrades.size();
+    float medianGrade;
+
+    if (gradesCount % 2 == 0) {
+        medianGrade = (sortedGrades[(gradesCount / 2) - 1] + sortedGrades[gradesCount / 2]) / 2.0;
+    } else {
+        medianGrade = sortedGrades[gradesCount / 2];
+    }
+
+    student.finalMdn = (medianGrade * gradesWeight) + (student.examGrade * examWeight);
+
+    return student;
+}
