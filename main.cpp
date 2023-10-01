@@ -143,6 +143,10 @@ int chooseGradeInputGen() {
     return gradeCount;
 }
 
+bool compareStudents(Student &left, Student &right) {
+    return left.name < right.name;
+}
+
 Student calculateAvg(Student &student) {
     student.finalAvg = ((accumulate(student.grades.begin(), student.grades.end(), student.finalAvg) / student.grades.size()) * gradesWeight) + (student.examGrade * examWeight);
     return student;
@@ -239,6 +243,8 @@ int main() {
     cout << endl << "There are " << students.size() << " students." << endl << endl;
 
     if (students.size() > 0) {
+        sort(students.begin(), students.end(), &compareStudents);
+        
         string finalGradeHeader = string("Final grade (") + (isAvg ? "avg" : "mdn") + ")";
 
         if (inputByHand) {
