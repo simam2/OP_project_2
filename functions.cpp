@@ -102,18 +102,6 @@ Student generateGrades(Student &student, int gradeCount) {
     return student;
 }
 
-bool chooseAvgMdn() {
-    char userChoice;
-
-    while (toupper(userChoice) != 'A' && toupper(userChoice) != 'M') {
-        cout << "Please choose how the final grade should be calculated - input 'A' for average or 'M' for median: ";
-        cin >> userChoice;
-        cout << endl;
-    }
-
-    return toupper(userChoice) == 'A';
-}
-
 bool chooseInputFile() {
     char userChoice;
 

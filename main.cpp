@@ -15,7 +15,6 @@ using namespace std;
 int main() {
     cout << endl << "If you wish to stop adding students, simply press ENTER without typing anything in when asked for a student's name." << endl << "The same rule applies to grade entering - if you entered all grades, simply press ENTER without typing anything in." << endl << endl;
 
-    bool isAvg = chooseAvgMdn();
     bool inputByHand = chooseInputFile();
 
     vector<Student> students;
@@ -38,11 +37,8 @@ int main() {
                 student = inputGrades(student);
             }
 
-            if (isAvg) {
-                student = calculateAvg(student);
-            } else {
-                student = calculateMdn(student);
-            }
+            student = calculateAvg(student);
+            student = calculateMdn(student);
 
             students.push_back(student);
             cout << endl;
@@ -69,15 +65,12 @@ int main() {
             student.grades.pop_back();
             student.examGrade = grade;
 
-            if (isAvg) {
-                student = calculateAvg(student);
-            } else {
-                student = calculateMdn(student);
-            }
+            student = calculateAvg(student);
+            student = calculateMdn(student);
 
             students.push_back(student);
         }
-
+Y
         file.close();
     }
 
@@ -85,26 +78,24 @@ int main() {
 
     if (students.size() > 0) {
         sort(students.begin(), students.end(), &compareStudents);
-        
-        string finalGradeHeader = string("Final grade (") + (isAvg ? "avg" : "mdn") + ")";
 
         if (inputByHand) {
             cout << left;
-            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << finalGradeHeader << endl;
-            cout << string(maxSurnameLength + maxNameLength + 20, '-') << endl;
+            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)" << setw(20) << "Final Grade (mdn)" <<endl;
+            cout << string(maxSurnameLength + maxNameLength + 40, '-') << endl;
             
             for (Student student : students) {
-                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << (isAvg ? student.finalAvg : student.finalMdn) << endl;
+                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
             }
         } else {
             ofstream file(outputFolderName + "/" + inputFileName);
 
             file << left;
-            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << finalGradeHeader << endl;
-            file << string(maxSurnameLength + maxNameLength + 20, '-') << endl;
+            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)" << setw(20) << "Final Grade (mdn)" << endl;
+            file << string(maxSurnameLength + maxNameLength + 40, '-') << endl;
             
             for (Student student : students) {
-                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << (isAvg ? student.finalAvg : student.finalMdn) << endl;
+                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
             }
 
             file.close();
