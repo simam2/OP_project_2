@@ -55,15 +55,34 @@ Student inputGrades(Student &student) {
             break;
         }
 
-        if (stoi(input) >= 1 && stoi(input) <= 10) {
-            count++;
-            student.grades.push_back(stoi(input));
+        try {
+            if (stoi(input) >= 1 && stoi(input) <= 10) {
+                count++;
+                student.grades.push_back(stoi(input));
+            } else {
+                cout << "You must enter a number between 1 and 10." << endl;
+            }
+        } catch (invalid_argument&) {
+            cout << "You must enter a number between 1 and 10." << endl;
         }
     }
 
     while (student.examGrade < 1 || student.examGrade > 10) {
         cout << "Please enter the exam grade for student " << student.name << " " << student.surname << ": ";
-        cin >> student.examGrade;
+        
+        string input;
+        cin >> input;
+
+        try {
+            if (stoi(input) >= 1 && stoi(input) <= 10) {
+                student.examGrade = stoi(input);
+            } else {
+                student.examGrade = -1;
+                cout << "You must enter a number between 1 and 10." << endl;
+            }
+        } catch (invalid_argument&) {
+            cout << "You must enter a number between 1 and 10." << endl;
+        }
     }
 
     return student;
