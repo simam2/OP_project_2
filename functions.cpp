@@ -7,6 +7,7 @@
 #include <random>
 #include <fstream>
 #include <sstream>
+#include <chrono>
 
 #include "student.h"
 #include "constants.h"
@@ -127,7 +128,7 @@ int chooseStudentCount() {
 }
 
 bool chooseInputFile() {
-    char userChoice;
+    char userChoice = 'A';
 
     while (toupper(userChoice) != 'Y' && toupper(userChoice) != 'N') {
         cout << "Please choose whether you would like to input students by hand - input 'Y' for manual input or 'N' for file read: ";
@@ -139,7 +140,7 @@ bool chooseInputFile() {
 }
 
 int chooseGradeInputGen() {
-    char userChoice;
+    char userChoice = 'A';
     int gradeCount = 0;
     
     while (toupper(userChoice) != 'Y' && toupper(userChoice) != 'N') {
@@ -190,6 +191,12 @@ Student calculateMdn(Student &student) {
     student.finalMdn = (medianGrade * gradesWeight) + (student.examGrade * examWeight);
 
     return student;
+}
+
+chrono::milliseconds calculateDuration(chrono::steady_clock::time_point &startTime) {
+    auto endTime = chrono::high_resolution_clock::now();
+    chrono::duration<double> timeDiff = endTime - startTime;
+    return chrono::duration_cast<chrono::milliseconds>(timeDiff);
 }
 
 void outputResults(vector<Student> &students, bool outputToTerminal, string fullFileName, bool printMdn, bool sortByName) {
@@ -253,6 +260,8 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
 void generateStudentFile(int &studentCount) {
     vector<Student> students;
 
+    auto startTime = chrono::high_resolution_clock::now();
+
     for (int i = 1; i <= studentCount; i++) {
         Student student = Student();
 
@@ -267,6 +276,11 @@ void generateStudentFile(int &studentCount) {
 
     sort(students.begin(), students.end(), &compareStudentFinalAvg);
     outputResults(students, false, (inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt"), false, false);
+
+    if (measureTime) {
+        chrono::milliseconds duration = calculateDuration(startTime);
+        cout << "File generation has taken " << duration.count() << endl;
+    }
 }
 
 vector<Student> readGeneratedStudents(int studentCount) {
