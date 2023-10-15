@@ -102,6 +102,30 @@ Student generateGrades(Student &student, int gradeCount) {
     return student;
 }
 
+char chooseAction() {
+    int userChoice = 0;
+
+    while (userChoice != 1 && userChoice != 2) {
+        cout << "Please choose what you'd like the program to do - input '1' if you would like to input/process data, input '2' if you want random input files to be generated: ";
+        cin >> userChoice;
+        cout << endl;
+    }
+
+    return userChoice;
+}
+
+int chooseStudentCount() {
+    int studentCount = 0;
+
+    while (studentCount < 1) {
+        cout << "Please choose how many students should be generated: ";
+        cin >> studentCount;
+        cout << endl;
+    }
+
+    return studentCount;
+}
+
 bool chooseInputFile() {
     char userChoice;
 
@@ -137,8 +161,12 @@ int chooseGradeInputGen() {
     return gradeCount;
 }
 
-bool compareStudents(Student &left, Student &right) {
+bool compareStudentNames(Student &left, Student &right) {
     return left.name < right.name;
+}
+
+bool compareStudentFinalAvg(Student &left, Student &right) {
+    return left.finalAvg < right.finalAvg;
 }
 
 Student calculateAvg(Student &student) {
@@ -162,4 +190,81 @@ Student calculateMdn(Student &student) {
     student.finalMdn = (medianGrade * gradesWeight) + (student.examGrade * examWeight);
 
     return student;
+}
+
+void outputResults(vector<Student> &students, bool outputToTerminal, string fullFileName, bool printMdn, bool sortByName) {
+    cout << endl << "There are " << students.size() << " students." << endl << endl;
+
+    if (students.size() > 0) {
+        if (sortByName) {
+            sort(students.begin(), students.end(), &compareStudentNames);
+        }
+
+        if (outputToTerminal) {
+            cout << left;
+            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+
+            if (printMdn) {
+                cout << setw(20) << "Final Grade (mdn)" << endl;
+            } else {
+                cout << endl;
+            }
+
+            cout << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            
+            for (Student student : students) {
+                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+
+                if (printMdn) {
+                    cout << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                } else {
+                    cout << endl;
+                }
+            }
+        } else {
+            ofstream file(fullFileName);
+
+            file << left;
+            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+
+            if (printMdn) {
+                file << setw(20) << "Final Grade (mdn)" << endl;
+            } else {
+                file << endl;
+            }
+
+            file << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            
+            for (Student student : students) {
+                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+
+                if (printMdn) {
+                    file << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                } else {
+                    file << endl;
+                }
+            }
+
+            file.close();
+        }
+    }
+}
+
+void generateStudentFile(int &studentCount) {
+    vector<Student> students;
+
+    for (int i = 1; i <= studentCount; i++) {
+        Student student = Student();
+
+        student.name = generatedNamePrefix + to_string(i);
+        student.surname = generatedSurnamePrefix + to_string(i);
+
+        student = generateGrades(student, generatedGradeCount);
+        student = calculateAvg(student);
+
+        students.push_back(student);
+    }
+
+    sort(students.begin(), students.end(), &compareStudentFinalAvg);
+    outputResults(students, false, (inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt"), false, false);
 }
