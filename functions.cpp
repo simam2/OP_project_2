@@ -13,6 +13,7 @@
 #include "constants.h"
 
 using namespace std;
+using namespace std::chrono;
 
 
 Student inputNameSurname(Student &student, int i) {
@@ -193,10 +194,10 @@ Student calculateMdn(Student &student) {
     return student;
 }
 
-chrono::milliseconds calculateDuration(chrono::steady_clock::time_point &startTime) {
-    auto endTime = chrono::high_resolution_clock::now();
-    chrono::duration<double> timeDiff = endTime - startTime;
-    return chrono::duration_cast<chrono::milliseconds>(timeDiff);
+milliseconds calculateDuration(steady_clock::time_point &startTime) {
+    auto endTime = high_resolution_clock::now();
+    duration<double> timeDiff = endTime - startTime;
+    return duration_cast<milliseconds>(timeDiff);
 }
 
 void outputResults(vector<Student> &students, bool outputToTerminal, string fullFileName, bool printMdn, bool sortByName) {
@@ -260,7 +261,7 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
 void generateStudentFile(int &studentCount) {
     vector<Student> students;
 
-    auto startTime = chrono::high_resolution_clock::now();
+    auto startTime = high_resolution_clock::now();
 
     for (int i = 1; i <= studentCount; i++) {
         Student student = Student();
@@ -278,8 +279,8 @@ void generateStudentFile(int &studentCount) {
     outputResults(students, false, (inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt"), false, false);
 
     if (measureTime) {
-        chrono::milliseconds duration = calculateDuration(startTime);
-        cout << "File generation has taken " << duration.count() << endl;
+        milliseconds duration = calculateDuration(startTime);
+        cout << "File generation took " << duration.count() << " milliseconds." << endl;
     }
 }
 
@@ -287,6 +288,8 @@ vector<Student> readGeneratedStudents(int studentCount) {
     vector<Student> students;
 
     string line;
+    auto startTime = high_resolution_clock::now();
+
     ifstream file(inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt");
 
     if (file.fail()) {
@@ -309,12 +312,19 @@ vector<Student> readGeneratedStudents(int studentCount) {
 
     file.close();
 
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "File read took " << duration.count() << " milliseconds." << endl;
+    }
+
     return students;
 }
 
 void splitOutputStudents(vector<Student> &students, int studentCount) {
     vector<Student> students1;
     vector<Student> students2;
+
+    auto startTime = high_resolution_clock::now();
 
     for (Student student : students) {
         if (student.finalAvg < 5) {
@@ -324,6 +334,18 @@ void splitOutputStudents(vector<Student> &students, int studentCount) {
         }
     }
 
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "Student split took " << duration.count() << " milliseconds." << endl;
+    }
+
+    startTime = high_resolution_clock::now();
+
     outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
     outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "Student output took " << duration.count() << " milliseconds." << endl;
+    }
 }
