@@ -105,8 +105,8 @@ Student generateGrades(Student &student, int gradeCount) {
 char chooseAction() {
     int userChoice = 0;
 
-    while (userChoice != 1 && userChoice != 2) {
-        cout << "Please choose what you'd like the program to do - input '1' if you would like to input/process data, input '2' if you want random input files to be generated: ";
+    while (userChoice != 1 && userChoice != 2 && userChoice != 3) {
+        cout << "Please choose what you'd like the program to do - input '1' if you would like to input/process data, input '2' if you want random input files to be generated, input '3' if you would like a generated file to be processed: ";
         cin >> userChoice;
         cout << endl;
     }
@@ -118,7 +118,7 @@ int chooseStudentCount() {
     int studentCount = 0;
 
     while (studentCount < 1) {
-        cout << "Please choose how many students should be generated: ";
+        cout << "Please choose how many students should be (or was) generated: ";
         cin >> studentCount;
         cout << endl;
     }
@@ -193,14 +193,14 @@ Student calculateMdn(Student &student) {
 }
 
 void outputResults(vector<Student> &students, bool outputToTerminal, string fullFileName, bool printMdn, bool sortByName) {
-    cout << endl << "There are " << students.size() << " students." << endl << endl;
-
     if (students.size() > 0) {
         if (sortByName) {
             sort(students.begin(), students.end(), &compareStudentNames);
         }
 
         if (outputToTerminal) {
+            cout << endl << "There are " << students.size() << " students." << endl << endl;
+
             cout << left;
             cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
 
@@ -267,4 +267,49 @@ void generateStudentFile(int &studentCount) {
 
     sort(students.begin(), students.end(), &compareStudentFinalAvg);
     outputResults(students, false, (inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt"), false, false);
+}
+
+vector<Student> readGeneratedStudents(int studentCount) {
+    vector<Student> students;
+
+    string line;
+    ifstream file(inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt");
+
+    if (file.fail()) {
+        cout << "A generated file of " << studentCount << " students could not be found." << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    getline(file, line);
+    getline(file, line);
+
+    while (getline(file, line)) {
+        Student student = Student();
+
+        istringstream splitString(line);
+
+        splitString >> student.name >> student.surname >> student.finalAvg;
+
+        students.push_back(student);
+    }
+
+    file.close();
+
+    return students;
+}
+
+void splitOutputStudents(vector<Student> &students, int studentCount) {
+    vector<Student> students1;
+    vector<Student> students2;
+
+    for (Student student : students) {
+        if (student.finalAvg < 5) {
+            students1.push_back(student);
+        } else {
+            students2.push_back(student);
+        }
+    }
+
+    outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+    outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
 }

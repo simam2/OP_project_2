@@ -18,3 +18,5 @@ const int generatedGradeCount = 10;
 const string generatedFilePrefix = "studentai_";
 const string generatedNamePrefix = "Vardas";
 const string generatedSurnamePrefix = "Pavarde";
+const string ouputFileSmartSuffix = "_smart";
+const string ouputFileNotAsSmartSuffix = "_notAsSmart";
