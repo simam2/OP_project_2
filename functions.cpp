@@ -7,11 +7,13 @@
 #include <random>
 #include <fstream>
 #include <sstream>
+#include <chrono>
 
 #include "student.h"
 #include "constants.h"
 
 using namespace std;
+using namespace std::chrono;
 
 
 Student inputNameSurname(Student &student, int i) {
@@ -102,8 +104,32 @@ Student generateGrades(Student &student, int gradeCount) {
     return student;
 }
 
+char chooseAction() {
+    int userChoice = 0;
+
+    while (userChoice != 1 && userChoice != 2 && userChoice != 3) {
+        cout << "Please choose what you'd like the program to do - input '1' if you would like to input/process data, input '2' if you want random input files to be generated, input '3' if you would like a generated file to be processed: ";
+        cin >> userChoice;
+        cout << endl;
+    }
+
+    return userChoice;
+}
+
+int chooseStudentCount() {
+    int studentCount = 0;
+
+    while (studentCount < 1) {
+        cout << "Please choose how many students should be (or was) generated: ";
+        cin >> studentCount;
+        cout << endl;
+    }
+
+    return studentCount;
+}
+
 bool chooseInputFile() {
-    char userChoice;
+    char userChoice = 'A';
 
     while (toupper(userChoice) != 'Y' && toupper(userChoice) != 'N') {
         cout << "Please choose whether you would like to input students by hand - input 'Y' for manual input or 'N' for file read: ";
@@ -115,7 +141,7 @@ bool chooseInputFile() {
 }
 
 int chooseGradeInputGen() {
-    char userChoice;
+    char userChoice = 'A';
     int gradeCount = 0;
     
     while (toupper(userChoice) != 'Y' && toupper(userChoice) != 'N') {
@@ -137,8 +163,12 @@ int chooseGradeInputGen() {
     return gradeCount;
 }
 
-bool compareStudents(Student &left, Student &right) {
+bool compareStudentNames(Student &left, Student &right) {
     return left.name < right.name;
+}
+
+bool compareStudentFinalAvg(Student &left, Student &right) {
+    return left.finalAvg < right.finalAvg;
 }
 
 Student calculateAvg(Student &student) {
@@ -162,4 +192,160 @@ Student calculateMdn(Student &student) {
     student.finalMdn = (medianGrade * gradesWeight) + (student.examGrade * examWeight);
 
     return student;
+}
+
+milliseconds calculateDuration(steady_clock::time_point &startTime) {
+    auto endTime = high_resolution_clock::now();
+    duration<double> timeDiff = endTime - startTime;
+    return duration_cast<milliseconds>(timeDiff);
+}
+
+void outputResults(vector<Student> &students, bool outputToTerminal, string fullFileName, bool printMdn, bool sortByName) {
+    if (students.size() > 0) {
+        if (sortByName) {
+            sort(students.begin(), students.end(), &compareStudentNames);
+        }
+
+        if (outputToTerminal) {
+            cout << endl << "There are " << students.size() << " students." << endl << endl;
+
+            cout << left;
+            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+
+            if (printMdn) {
+                cout << setw(20) << "Final Grade (mdn)" << endl;
+            } else {
+                cout << endl;
+            }
+
+            cout << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            
+            for (Student student : students) {
+                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+
+                if (printMdn) {
+                    cout << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                } else {
+                    cout << endl;
+                }
+            }
+        } else {
+            ofstream file(fullFileName);
+
+            file << left;
+            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+
+            if (printMdn) {
+                file << setw(20) << "Final Grade (mdn)" << endl;
+            } else {
+                file << endl;
+            }
+
+            file << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            
+            for (Student student : students) {
+                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+
+                if (printMdn) {
+                    file << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                } else {
+                    file << endl;
+                }
+            }
+
+            file.close();
+        }
+    }
+}
+
+void generateStudentFile(int &studentCount) {
+    vector<Student> students;
+
+    auto startTime = high_resolution_clock::now();
+
+    for (int i = 1; i <= studentCount; i++) {
+        Student student = Student();
+
+        student.name = generatedNamePrefix + to_string(i);
+        student.surname = generatedSurnamePrefix + to_string(i);
+
+        student = generateGrades(student, generatedGradeCount);
+        student = calculateAvg(student);
+
+        students.push_back(student);
+    }
+
+    sort(students.begin(), students.end(), &compareStudentFinalAvg);
+    outputResults(students, false, (inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt"), false, false);
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "File generation took " << duration.count() << " milliseconds." << endl;
+    }
+}
+
+vector<Student> readGeneratedStudents(int studentCount) {
+    vector<Student> students;
+
+    string line;
+    auto startTime = high_resolution_clock::now();
+
+    ifstream file(inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt");
+
+    if (file.fail()) {
+        cout << "A generated file of " << studentCount << " students could not be found." << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    getline(file, line);
+    getline(file, line);
+
+    while (getline(file, line)) {
+        Student student = Student();
+
+        istringstream splitString(line);
+
+        splitString >> student.name >> student.surname >> student.finalAvg;
+
+        students.push_back(student);
+    }
+
+    file.close();
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "File read took " << duration.count() << " milliseconds." << endl;
+    }
+
+    return students;
+}
+
+void splitOutputStudents(vector<Student> &students, int studentCount) {
+    vector<Student> students1;
+    vector<Student> students2;
+
+    auto startTime = high_resolution_clock::now();
+
+    for (Student student : students) {
+        if (student.finalAvg < 5) {
+            students1.push_back(student);
+        } else {
+            students2.push_back(student);
+        }
+    }
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "Student split took " << duration.count() << " milliseconds." << endl;
+    }
+
+    startTime = high_resolution_clock::now();
+
+    outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+    outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "Student output took " << duration.count() << " milliseconds." << endl;
+    }
 }
