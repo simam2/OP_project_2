@@ -81,12 +81,25 @@ int main() {
     } else if (programMode == 2) {
         int studentCount = chooseStudentCount();
 
-        generateStudentFile(studentCount);
+        if (measureTime) {
+            for (int i = 0; i < measureTimeIterationCount; i++) {
+                generateStudentFile(studentCount);
+            }
+        } else {
+            generateStudentFile(studentCount);
+        }
     } else if (programMode == 3) {
         int studentCount = chooseStudentCount();
-        vector<Student> students = readGeneratedStudents(studentCount);
 
-        splitOutputStudents(students, studentCount);
+        if (measureTime) {
+            for (int i = 0; i < measureTimeIterationCount; i++) {
+                vector<Student> students = readGeneratedStudents(studentCount);
+                splitOutputStudents(students, studentCount);
+            }
+        } else {
+            vector<Student> students = readGeneratedStudents(studentCount);
+            splitOutputStudents(students, studentCount);
+        }
     }
     
 }

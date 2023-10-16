@@ -14,6 +14,7 @@ const string outputFolderName = "output";
 const string inputFileName = "studentai10000.txt";
 
 const bool measureTime = true;
+const int measureTimeIterationCount = 5;
 const int generatedGradeCount = 10;
 const string generatedFilePrefix = "studentai_";
 const string generatedNamePrefix = "Vardas";
