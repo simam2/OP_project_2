@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <list>
 #include <iostream>
 #include <algorithm>
 #include <numeric>
@@ -194,11 +195,14 @@ Student calculateMdn(Student &student) {
     return student;
 }
 
-milliseconds calculateDuration(steady_clock::time_point &startTime) {
+milliseconds calculateDuration(system_clock::time_point &startTime) {
     auto endTime = high_resolution_clock::now();
     duration<double> timeDiff = endTime - startTime;
     return duration_cast<milliseconds>(timeDiff);
 }
+
+
+// Vector functions
 
 void outputResults(vector<Student> &students, bool outputToTerminal, string fullFileName, bool printMdn, bool sortByName) {
     if (students.size() > 0) {
@@ -207,7 +211,7 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
         }
 
         if (outputToTerminal) {
-            cout << endl << "There are " << students.size() << " students." << endl << endl;
+            cout << endl << "(VECTOR) There are " << students.size() << " students." << endl << endl;
 
             cout << left;
             cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
@@ -280,7 +284,7 @@ void generateStudentFile(int &studentCount) {
 
     if (measureTime) {
         milliseconds duration = calculateDuration(startTime);
-        cout << "File generation took " << duration.count() << " milliseconds." << endl;
+        cout << "(VECTOR) File generation took " << duration.count() << " milliseconds." << endl;
     }
 }
 
@@ -314,7 +318,7 @@ vector<Student> readGeneratedStudents(int studentCount) {
 
     if (measureTime) {
         milliseconds duration = calculateDuration(startTime);
-        cout << "File read took " << duration.count() << " milliseconds." << endl;
+        cout << "(VECTOR) File read took " << duration.count() << " milliseconds." << endl;
     }
 
     return students;
@@ -336,7 +340,7 @@ void splitOutputStudents(vector<Student> &students, int studentCount) {
 
     if (measureTime) {
         milliseconds duration = calculateDuration(startTime);
-        cout << "Student split took " << duration.count() << " milliseconds." << endl;
+        cout << "(VECTOR) Student split took " << duration.count() << " milliseconds." << endl;
     }
 
     startTime = high_resolution_clock::now();
@@ -346,6 +350,159 @@ void splitOutputStudents(vector<Student> &students, int studentCount) {
 
     if (measureTime) {
         milliseconds duration = calculateDuration(startTime);
-        cout << "Student output took " << duration.count() << " milliseconds." << endl;
+        cout << "(VECTOR) Student output took " << duration.count() << " milliseconds." << endl;
+    }
+}
+
+
+// List functions
+
+void outputResults(list<Student> &students, bool outputToTerminal, string fullFileName, bool printMdn, bool sortByName) {
+    if (students.size() > 0) {
+        if (sortByName) {
+            students.sort(&compareStudentNames);
+        }
+
+        if (outputToTerminal) {
+            cout << endl << "(LIST) There are " << students.size() << " students." << endl << endl;
+
+            cout << left;
+            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+
+            if (printMdn) {
+                cout << setw(20) << "Final Grade (mdn)" << endl;
+            } else {
+                cout << endl;
+            }
+
+            cout << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            
+            for (Student student : students) {
+                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+
+                if (printMdn) {
+                    cout << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                } else {
+                    cout << endl;
+                }
+            }
+        } else {
+            ofstream file(fullFileName);
+
+            file << left;
+            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+
+            if (printMdn) {
+                file << setw(20) << "Final Grade (mdn)" << endl;
+            } else {
+                file << endl;
+            }
+
+            file << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            
+            for (Student student : students) {
+                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+
+                if (printMdn) {
+                    file << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                } else {
+                    file << endl;
+                }
+            }
+
+            file.close();
+        }
+    }
+}
+
+void generateStudentFileList(int &studentCount) {
+    list<Student> students;
+
+    auto startTime = high_resolution_clock::now();
+
+    for (int i = 1; i <= studentCount; i++) {
+        Student student = Student();
+
+        student.name = generatedNamePrefix + to_string(i);
+        student.surname = generatedSurnamePrefix + to_string(i);
+
+        student = generateGrades(student, generatedGradeCount);
+        student = calculateAvg(student);
+
+        students.push_back(student);
+    }
+
+    students.sort(&compareStudentFinalAvg);
+    outputResults(students, false, (inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt"), false, false);
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "(LIST) File generation took " << duration.count() << " milliseconds." << endl;
+    }
+}
+
+list<Student> readGeneratedStudentsList(int studentCount) {
+    list<Student> students;
+
+    string line;
+    auto startTime = high_resolution_clock::now();
+
+    ifstream file(inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt");
+
+    if (file.fail()) {
+        cout << "A generated file of " << studentCount << " students could not be found." << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    getline(file, line);
+    getline(file, line);
+
+    while (getline(file, line)) {
+        Student student = Student();
+
+        istringstream splitString(line);
+
+        splitString >> student.name >> student.surname >> student.finalAvg;
+
+        students.push_back(student);
+    }
+
+    file.close();
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "(LIST) File read took " << duration.count() << " milliseconds." << endl;
+    }
+
+    return students;
+}
+
+void splitOutputStudents(list<Student> &students, int studentCount) {
+    list<Student> students1;
+    list<Student> students2;
+
+    auto startTime = high_resolution_clock::now();
+
+    for (Student student : students) {
+        if (student.finalAvg < 5) {
+            students1.push_back(student);
+        } else {
+            students2.push_back(student);
+        }
+    }
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "(LIST) Student split took " << duration.count() << " milliseconds." << endl;
+    }
+
+    startTime = high_resolution_clock::now();
+
+    outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+    outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "(LIST) Student output took " << duration.count() << " milliseconds." << endl;
     }
 }

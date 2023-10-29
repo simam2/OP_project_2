@@ -84,6 +84,9 @@ int main() {
         if (measureTime) {
             for (int i = 0; i < measureTimeIterationCount; i++) {
                 generateStudentFile(studentCount);
+                generateStudentFileList(studentCount);
+                
+                cout << endl;
             }
         } else {
             generateStudentFile(studentCount);
@@ -95,6 +98,11 @@ int main() {
             for (int i = 0; i < measureTimeIterationCount; i++) {
                 vector<Student> students = readGeneratedStudents(studentCount);
                 splitOutputStudents(students, studentCount);
+
+                list<Student> studentsList = readGeneratedStudentsList(studentCount);
+                splitOutputStudents(studentsList, studentCount);
+
+                cout << endl;
             }
         } else {
             vector<Student> students = readGeneratedStudents(studentCount);
