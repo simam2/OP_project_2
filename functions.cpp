@@ -346,11 +346,19 @@ void splitOutputStudents(vector<Student> &students, int studentCount) {
     startTime = high_resolution_clock::now();
 
     outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "(VECTOR) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
+    }
+    
+    startTime = high_resolution_clock::now();
+
     outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
 
     if (measureTime) {
         milliseconds duration = calculateDuration(startTime);
-        cout << "(VECTOR) Student output took " << duration.count() << " milliseconds." << endl;
+        cout << "(VECTOR) Student (smart) output took " << duration.count() << " milliseconds." << endl;
     }
 }
 
@@ -499,10 +507,18 @@ void splitOutputStudents(list<Student> &students, int studentCount) {
     startTime = high_resolution_clock::now();
 
     outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+    
+    if (measureTime) {
+        milliseconds duration = calculateDuration(startTime);
+        cout << "(LIST) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
+    }
+    
+    startTime = high_resolution_clock::now();
+
     outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
 
     if (measureTime) {
         milliseconds duration = calculateDuration(startTime);
-        cout << "(LIST) Student output took " << duration.count() << " milliseconds." << endl;
+        cout << "(LIST) Student (smart) output took " << duration.count() << " milliseconds." << endl;
     }
 }

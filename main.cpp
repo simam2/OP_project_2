@@ -96,13 +96,21 @@ int main() {
 
         if (measureTime) {
             for (int i = 0; i < measureTimeIterationCount; i++) {
+                auto startTime = high_resolution_clock::now();
+
                 vector<Student> students = readGeneratedStudents(studentCount);
                 splitOutputStudents(students, studentCount);
+
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Full test time: " << duration.count() << " milliseconds." << endl << endl;
+
+                startTime = high_resolution_clock::now();
 
                 list<Student> studentsList = readGeneratedStudentsList(studentCount);
                 splitOutputStudents(studentsList, studentCount);
 
-                cout << endl;
+                duration = calculateDuration(startTime);
+                cout << "(LIST) Full test time: " << duration.count() << " milliseconds." << endl << endl << endl;
             }
         } else {
             vector<Student> students = readGeneratedStudents(studentCount);
