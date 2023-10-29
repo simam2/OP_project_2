@@ -85,6 +85,7 @@ int main() {
 
             if (measureTime) {
                 for (int i = 0; i < measureTimeIterationCount; i++) {
+                    cout << "Iteration number - " << i+1 << endl;
                     generateStudentFile(studentCount);
                     generateStudentFileList(studentCount);
                     
@@ -99,6 +100,7 @@ int main() {
 
                 if (measureTime) {
                     for (int i = 0; i < measureTimeIterationCount; i++) {
+                        cout << "Iteration number - " << i+1 << endl;
                         generateStudentFile(studentCount);
                         generateStudentFileList(studentCount);
                         
@@ -116,6 +118,7 @@ int main() {
 
             if (measureTime) {
                 for (int i = 0; i < measureTimeIterationCount; i++) {
+                    cout << "Iteration number - " << i+1 << endl;
                     auto startTime = high_resolution_clock::now();
 
                     vector<Student> students = readGeneratedStudents(studentCount);
@@ -142,6 +145,7 @@ int main() {
 
                 if (measureTime) {
                     for (int i = 0; i < measureTimeIterationCount; i++) {
+                        cout << "Iteration number - " << i+1 << endl;
                         auto startTime = high_resolution_clock::now();
 
                         vector<Student> students = readGeneratedStudents(studentCount);
