@@ -79,42 +79,90 @@ int main() {
 
         outputResults(students, inputByHand, (outputFolderName + "/" + inputFileName), true, true);
     } else if (programMode == 2) {
-        int studentCount = chooseStudentCount();
+        if (studentCounts.empty()) {
+            int studentCount = chooseStudentCount();
+            cout << endl << "Generating a file of " << studentCount << " students." << endl;
 
-        if (measureTime) {
-            for (int i = 0; i < measureTimeIterationCount; i++) {
+            if (measureTime) {
+                for (int i = 0; i < measureTimeIterationCount; i++) {
+                    generateStudentFile(studentCount);
+                    generateStudentFileList(studentCount);
+                    
+                    cout << endl;
+                }
+            } else {
                 generateStudentFile(studentCount);
-                generateStudentFileList(studentCount);
-                
-                cout << endl;
             }
         } else {
-            generateStudentFile(studentCount);
+            for (int studentCount : studentCounts) {
+                cout << endl << "Generating a file of " << studentCount << " students." << endl;
+
+                if (measureTime) {
+                    for (int i = 0; i < measureTimeIterationCount; i++) {
+                        generateStudentFile(studentCount);
+                        generateStudentFileList(studentCount);
+                        
+                        cout << endl;
+                    }
+                } else {
+                    generateStudentFile(studentCount);
+                }
+            }
         }
     } else if (programMode == 3) {
-        int studentCount = chooseStudentCount();
+        if (studentCounts.empty()) {
+            int studentCount = chooseStudentCount();
+            cout << endl << "Processing a file of " << studentCount << " students." << endl;
 
-        if (measureTime) {
-            for (int i = 0; i < measureTimeIterationCount; i++) {
-                auto startTime = high_resolution_clock::now();
+            if (measureTime) {
+                for (int i = 0; i < measureTimeIterationCount; i++) {
+                    auto startTime = high_resolution_clock::now();
 
+                    vector<Student> students = readGeneratedStudents(studentCount);
+                    splitOutputStudents(students, studentCount);
+
+                    milliseconds duration = calculateDuration(startTime);
+                    cout << "(VECTOR) Full test time: " << duration.count() << " milliseconds." << endl << endl;
+
+                    startTime = high_resolution_clock::now();
+
+                    list<Student> studentsList = readGeneratedStudentsList(studentCount);
+                    splitOutputStudents(studentsList, studentCount);
+
+                    duration = calculateDuration(startTime);
+                    cout << "(LIST) Full test time: " << duration.count() << " milliseconds." << endl << endl << endl;
+                }
+            } else {
                 vector<Student> students = readGeneratedStudents(studentCount);
                 splitOutputStudents(students, studentCount);
-
-                milliseconds duration = calculateDuration(startTime);
-                cout << "(VECTOR) Full test time: " << duration.count() << " milliseconds." << endl << endl;
-
-                startTime = high_resolution_clock::now();
-
-                list<Student> studentsList = readGeneratedStudentsList(studentCount);
-                splitOutputStudents(studentsList, studentCount);
-
-                duration = calculateDuration(startTime);
-                cout << "(LIST) Full test time: " << duration.count() << " milliseconds." << endl << endl << endl;
             }
         } else {
-            vector<Student> students = readGeneratedStudents(studentCount);
-            splitOutputStudents(students, studentCount);
+            for (int studentCount : studentCounts) {
+                cout << endl << "Processing a file of " << studentCount << " students." << endl;
+
+                if (measureTime) {
+                    for (int i = 0; i < measureTimeIterationCount; i++) {
+                        auto startTime = high_resolution_clock::now();
+
+                        vector<Student> students = readGeneratedStudents(studentCount);
+                        splitOutputStudents(students, studentCount);
+
+                        milliseconds duration = calculateDuration(startTime);
+                        cout << "(VECTOR) Full test time: " << duration.count() << " milliseconds." << endl << endl;
+
+                        startTime = high_resolution_clock::now();
+
+                        list<Student> studentsList = readGeneratedStudentsList(studentCount);
+                        splitOutputStudents(studentsList, studentCount);
+
+                        duration = calculateDuration(startTime);
+                        cout << "(LIST) Full test time: " << duration.count() << " milliseconds." << endl << endl << endl;
+                    }
+                } else {
+                    vector<Student> students = readGeneratedStudents(studentCount);
+                    splitOutputStudents(students, studentCount);
+                }
+            }
         }
     }
     
