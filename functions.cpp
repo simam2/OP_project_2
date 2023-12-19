@@ -427,6 +427,34 @@ void splitOutputStudents(vector<Student> &students, int studentCount) {
         }
 
         case 3: {
+            vector<Student> students1;
+            vector<Student> students2;
+
+            remove_copy_if(students.begin(), students.end(), back_inserter(students1), [](Student &student) { return student.finalAvg >= 5; });
+            remove_copy_if(students.begin(), students.end(), back_inserter(students2), [](Student &student) { return student.finalAvg < 5; });
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student split took " << duration.count() << " milliseconds." << endl;
+            }
+
+            startTime = high_resolution_clock::now();
+
+            outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+            
+            startTime = high_resolution_clock::now();
+
+            outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (smart) output took " << duration.count() << " milliseconds." << endl;
+            }
 
             break;
         }
