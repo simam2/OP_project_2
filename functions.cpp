@@ -346,43 +346,92 @@ vector<Student> readGeneratedStudents(int studentCount) {
 }
 
 void splitOutputStudents(vector<Student> &students, int studentCount) {
-    vector<Student> students1;
-    vector<Student> students2;
-
     auto startTime = high_resolution_clock::now();
 
-    for (Student student : students) {
-        if (student.finalAvg < 5) {
-            students1.push_back(student);
-        } else {
-            students2.push_back(student);
+    switch (studentSplitStrategy) {
+        case 1: {
+            vector<Student> students1;
+            vector<Student> students2;
+
+            for (Student student : students) {
+                if (student.finalAvg < 5) {
+                    students1.push_back(student);
+                } else {
+                    students2.push_back(student);
+                }
+            }
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student split took " << duration.count() << " milliseconds." << endl;
+            }
+
+            startTime = high_resolution_clock::now();
+
+            outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+            
+            startTime = high_resolution_clock::now();
+
+            outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+
+            break;
+        }
+
+        case 2: {
+            vector<Student> students1;
+
+            for (auto it = students.begin(); it != students.end(); ++it) {
+                int index = distance(students.begin(), it);
+                Student student = students.at(index);
+                
+                if (student.finalAvg < 5) {
+                    students1.push_back(student);
+                    students.erase(it);
+                }
+            }
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student split took " << duration.count() << " milliseconds." << endl;
+            }
+
+            startTime = high_resolution_clock::now();
+
+            outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+            
+            startTime = high_resolution_clock::now();
+
+            outputResults(students, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+
+            break;
+        }
+
+        case 3: {
+
+            break;
         }
     }
-
-    if (measureTime) {
-        milliseconds duration = calculateDuration(startTime);
-        cout << "(VECTOR) Student split took " << duration.count() << " milliseconds." << endl;
-    }
-
-    startTime = high_resolution_clock::now();
-
-    outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
-
-    if (measureTime) {
-        milliseconds duration = calculateDuration(startTime);
-        cout << "(VECTOR) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
-    }
-    
-    startTime = high_resolution_clock::now();
-
-    outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
-
-    if (measureTime) {
-        milliseconds duration = calculateDuration(startTime);
-        cout << "(VECTOR) Student (smart) output took " << duration.count() << " milliseconds." << endl;
-    }
 }
-
 
 // List functions
 

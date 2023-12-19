@@ -133,7 +133,7 @@ int main() {
                     milliseconds duration = calculateDuration(startTime);
                     cout << "(VECTOR) Full test time: " << duration.count() << " milliseconds." << endl << endl;
 
-                    if (measureList) {
+                    if (measureList && studentSplitStrategy == 1) {
                         startTime = high_resolution_clock::now();
 
                         list<Student> studentsList = readGeneratedStudentsList(studentCount);
@@ -162,7 +162,7 @@ int main() {
                         milliseconds duration = calculateDuration(startTime);
                         cout << "(VECTOR) Full test time: " << duration.count() << " milliseconds." << endl << endl;
 
-                        if (measureList) {
+                        if (measureList && studentSplitStrategy == 1) {
                             startTime = high_resolution_clock::now();
 
                             list<Student> studentsList = readGeneratedStudentsList(studentCount);

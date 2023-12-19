@@ -15,6 +15,7 @@ const string inputFileName = "studentai10000.txt";
 
 const bool measureTime = true;
 const bool measureList = false;
+const int studentSplitStrategy = 1; // 1 - split the original list into two new ones; 2 - remove the "notAsSmart" ones from the original list and put them into a new list;
 const vector<int> studentCounts = {1000, 10000, 100000};
 const int measureTimeIterationCount = 5;
 const int generatedGradeCount = 10;
