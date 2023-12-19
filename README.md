@@ -1,6 +1,6 @@
 
 # OP project
-### v0.3
+### v1.0
 
  - Programa naudoja struktūrą duomenims saugoti:
 	 - *string* tipas: studento vardas ir pavardė;
