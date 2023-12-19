@@ -214,7 +214,7 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
             cout << endl << "(VECTOR) There are " << students.size() << " students." << endl << endl;
 
             cout << left;
-            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(32) << "All grades" << setw(20) << "Final Grade (avg)";
 
             if (printMdn) {
                 cout << setw(20) << "Final Grade (mdn)" << endl;
@@ -222,10 +222,16 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
                 cout << endl;
             }
 
-            cout << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            cout << string(maxSurnameLength + maxNameLength + 32 + (printMdn ? 40 : 20), '-') << endl;
             
             for (Student student : students) {
-                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                string allGrades = "";
+                for (int grade : student.grades) {
+                    allGrades += to_string(grade);
+                    allGrades += " ";
+                }
+
+                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
 
                 if (printMdn) {
                     cout << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
@@ -237,7 +243,7 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
             ofstream file(fullFileName);
 
             file << left;
-            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(32) << "All grades" << setw(20) << "Final Grade (avg)";
 
             if (printMdn) {
                 file << setw(20) << "Final Grade (mdn)" << endl;
@@ -245,10 +251,16 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
                 file << endl;
             }
 
-            file << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            file << string(maxSurnameLength + maxNameLength + 32 + (printMdn ? 40 : 20), '-') << endl;
             
             for (Student student : students) {
-                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                string allGrades = "";
+                for (int grade : student.grades) {
+                    allGrades += to_string(grade);
+                    allGrades += " ";
+                }
+
+                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
 
                 if (printMdn) {
                     file << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
@@ -309,7 +321,16 @@ vector<Student> readGeneratedStudents(int studentCount) {
 
         istringstream splitString(line);
 
-        splitString >> student.name >> student.surname >> student.finalAvg;
+        splitString >> student.name >> student.surname;
+
+        for (int i = 0; i < generatedGradeCount; i++) {
+            int grade;
+    
+            splitString >> grade;
+            student.grades.push_back(grade);
+        }
+
+        splitString >> student.finalAvg;
 
         students.push_back(student);
     }
@@ -325,43 +346,120 @@ vector<Student> readGeneratedStudents(int studentCount) {
 }
 
 void splitOutputStudents(vector<Student> &students, int studentCount) {
-    vector<Student> students1;
-    vector<Student> students2;
-
     auto startTime = high_resolution_clock::now();
 
-    for (Student student : students) {
-        if (student.finalAvg < 5) {
-            students1.push_back(student);
-        } else {
-            students2.push_back(student);
+    switch (studentSplitStrategy) {
+        case 1: {
+            vector<Student> students1;
+            vector<Student> students2;
+
+            for (Student student : students) {
+                if (student.finalAvg < 5) {
+                    students1.push_back(student);
+                } else {
+                    students2.push_back(student);
+                }
+            }
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student split took " << duration.count() << " milliseconds." << endl;
+            }
+
+            startTime = high_resolution_clock::now();
+
+            outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+            
+            startTime = high_resolution_clock::now();
+
+            outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+
+            break;
+        }
+
+        case 2: {
+            vector<Student> students1;
+
+            for (auto it = students.begin(); it != students.end(); ++it) {
+                int index = distance(students.begin(), it);
+                Student student = students.at(index);
+                
+                if (student.finalAvg < 5) {
+                    students1.push_back(student);
+                    students.erase(it);
+                }
+            }
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student split took " << duration.count() << " milliseconds." << endl;
+            }
+
+            startTime = high_resolution_clock::now();
+
+            outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+            
+            startTime = high_resolution_clock::now();
+
+            outputResults(students, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+
+            break;
+        }
+
+        case 3: {
+            vector<Student> students1;
+            vector<Student> students2;
+
+            remove_copy_if(students.begin(), students.end(), back_inserter(students1), [](Student &student) { return student.finalAvg >= 5; });
+            remove_copy_if(students.begin(), students.end(), back_inserter(students2), [](Student &student) { return student.finalAvg < 5; });
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student split took " << duration.count() << " milliseconds." << endl;
+            }
+
+            startTime = high_resolution_clock::now();
+
+            outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+            
+            startTime = high_resolution_clock::now();
+
+            outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
+
+            if (measureTime) {
+                milliseconds duration = calculateDuration(startTime);
+                cout << "(VECTOR) Student (smart) output took " << duration.count() << " milliseconds." << endl;
+            }
+
+            break;
         }
     }
-
-    if (measureTime) {
-        milliseconds duration = calculateDuration(startTime);
-        cout << "(VECTOR) Student split took " << duration.count() << " milliseconds." << endl;
-    }
-
-    startTime = high_resolution_clock::now();
-
-    outputResults(students1, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileNotAsSmartSuffix + ".txt"), false, false);
-
-    if (measureTime) {
-        milliseconds duration = calculateDuration(startTime);
-        cout << "(VECTOR) Student (not as smart) output took " << duration.count() << " milliseconds." << endl;
-    }
-    
-    startTime = high_resolution_clock::now();
-
-    outputResults(students2, false, (outputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ouputFileSmartSuffix + ".txt"), false, false);
-
-    if (measureTime) {
-        milliseconds duration = calculateDuration(startTime);
-        cout << "(VECTOR) Student (smart) output took " << duration.count() << " milliseconds." << endl;
-    }
 }
-
 
 // List functions
 
@@ -375,7 +473,7 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
             cout << endl << "(LIST) There are " << students.size() << " students." << endl << endl;
 
             cout << left;
-            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(32) << "All grades" << setw(20) << "Final Grade (avg)";
 
             if (printMdn) {
                 cout << setw(20) << "Final Grade (mdn)" << endl;
@@ -383,10 +481,16 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
                 cout << endl;
             }
 
-            cout << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            cout << string(maxSurnameLength + maxNameLength + 32 + (printMdn ? 40 : 20), '-') << endl;
             
             for (Student student : students) {
-                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                string allGrades = "";
+                for (int grade : student.grades) {
+                    allGrades += to_string(grade);
+                    allGrades += " ";
+                }
+
+                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
 
                 if (printMdn) {
                     cout << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
@@ -398,7 +502,7 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
             ofstream file(fullFileName);
 
             file << left;
-            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(32) << "All grades" << setw(20) << "Final Grade (avg)";
 
             if (printMdn) {
                 file << setw(20) << "Final Grade (mdn)" << endl;
@@ -406,10 +510,16 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
                 file << endl;
             }
 
-            file << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            file << string(maxSurnameLength + maxNameLength + 32 + (printMdn ? 40 : 20), '-') << endl;
             
             for (Student student : students) {
-                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                string allGrades = "";
+                for (int grade : student.grades) {
+                    allGrades += to_string(grade);
+                    allGrades += " ";
+                }
+
+                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
 
                 if (printMdn) {
                     file << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
@@ -470,7 +580,16 @@ list<Student> readGeneratedStudentsList(int studentCount) {
 
         istringstream splitString(line);
 
-        splitString >> student.name >> student.surname >> student.finalAvg;
+        splitString >> student.name >> student.surname;
+
+        for (int i = 0; i < generatedGradeCount; i++) {
+            int grade;
+    
+            splitString >> grade;
+            student.grades.push_back(grade);
+        }
+
+        splitString >> student.finalAvg;
 
         students.push_back(student);
     }
