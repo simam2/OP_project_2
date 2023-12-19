@@ -214,7 +214,7 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
             cout << endl << "(VECTOR) There are " << students.size() << " students." << endl << endl;
 
             cout << left;
-            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(32) << "All grades" << setw(20) << "Final Grade (avg)";
 
             if (printMdn) {
                 cout << setw(20) << "Final Grade (mdn)" << endl;
@@ -222,10 +222,16 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
                 cout << endl;
             }
 
-            cout << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            cout << string(maxSurnameLength + maxNameLength + 32 + (printMdn ? 40 : 20), '-') << endl;
             
             for (Student student : students) {
-                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                string allGrades = "";
+                for (int grade : student.grades) {
+                    allGrades += to_string(grade);
+                    allGrades += " ";
+                }
+
+                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
 
                 if (printMdn) {
                     cout << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
@@ -237,7 +243,7 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
             ofstream file(fullFileName);
 
             file << left;
-            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(32) << "All grades" << setw(20) << "Final Grade (avg)";
 
             if (printMdn) {
                 file << setw(20) << "Final Grade (mdn)" << endl;
@@ -245,10 +251,16 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
                 file << endl;
             }
 
-            file << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            file << string(maxSurnameLength + maxNameLength + 32 + (printMdn ? 40 : 20), '-') << endl;
             
             for (Student student : students) {
-                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                string allGrades = "";
+                for (int grade : student.grades) {
+                    allGrades += to_string(grade);
+                    allGrades += " ";
+                }
+
+                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
 
                 if (printMdn) {
                     file << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
@@ -309,7 +321,16 @@ vector<Student> readGeneratedStudents(int studentCount) {
 
         istringstream splitString(line);
 
-        splitString >> student.name >> student.surname >> student.finalAvg;
+        splitString >> student.name >> student.surname;
+
+        for (int i = 0; i < generatedGradeCount; i++) {
+            int grade;
+    
+            splitString >> grade;
+            student.grades.push_back(grade);
+        }
+
+        splitString >> student.finalAvg;
 
         students.push_back(student);
     }
@@ -375,7 +396,7 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
             cout << endl << "(LIST) There are " << students.size() << " students." << endl << endl;
 
             cout << left;
-            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+            cout << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(32) << "All grades" << setw(20) << "Final Grade (avg)";
 
             if (printMdn) {
                 cout << setw(20) << "Final Grade (mdn)" << endl;
@@ -383,10 +404,16 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
                 cout << endl;
             }
 
-            cout << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            cout << string(maxSurnameLength + maxNameLength + 32 + (printMdn ? 40 : 20), '-') << endl;
             
             for (Student student : students) {
-                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                string allGrades = "";
+                for (int grade : student.grades) {
+                    allGrades += to_string(grade);
+                    allGrades += " ";
+                }
+
+                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
 
                 if (printMdn) {
                     cout << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
@@ -398,7 +425,7 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
             ofstream file(fullFileName);
 
             file << left;
-            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(20) << "Final Grade (avg)";
+            file << setw(maxSurnameLength) << "Surname" << setw(maxNameLength) << "Name" << setw(32) << "All grades" << setw(20) << "Final Grade (avg)";
 
             if (printMdn) {
                 file << setw(20) << "Final Grade (mdn)" << endl;
@@ -406,10 +433,16 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
                 file << endl;
             }
 
-            file << string(maxSurnameLength + maxNameLength + (printMdn ? 40 : 20), '-') << endl;
+            file << string(maxSurnameLength + maxNameLength + 32 + (printMdn ? 40 : 20), '-') << endl;
             
             for (Student student : students) {
-                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                string allGrades = "";
+                for (int grade : student.grades) {
+                    allGrades += to_string(grade);
+                    allGrades += " ";
+                }
+
+                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
 
                 if (printMdn) {
                     file << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
@@ -470,7 +503,16 @@ list<Student> readGeneratedStudentsList(int studentCount) {
 
         istringstream splitString(line);
 
-        splitString >> student.name >> student.surname >> student.finalAvg;
+        splitString >> student.name >> student.surname;
+
+        for (int i = 0; i < generatedGradeCount; i++) {
+            int grade;
+    
+            splitString >> grade;
+            student.grades.push_back(grade);
+        }
+
+        splitString >> student.finalAvg;
 
         students.push_back(student);
     }
