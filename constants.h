@@ -14,7 +14,8 @@ const string outputFolderName = "output";
 const string inputFileName = "studentai10000.txt";
 
 const bool measureTime = true;
-const vector<int> studentCounts = {1000, 10000, 100000}; 
+const bool measureList = false;
+const vector<int> studentCounts = {1000, 10000, 100000};
 const int measureTimeIterationCount = 5;
 const int generatedGradeCount = 10;
 const string generatedFilePrefix = "studentai_";

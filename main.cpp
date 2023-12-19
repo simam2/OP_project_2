@@ -87,7 +87,10 @@ int main() {
                 for (int i = 0; i < measureTimeIterationCount; i++) {
                     cout << "Iteration number - " << i+1 << endl;
                     generateStudentFile(studentCount);
-                    generateStudentFileList(studentCount);
+
+                    if (measureList) {
+                        generateStudentFileList(studentCount);
+                    }
                     
                     cout << endl;
                 }
@@ -102,7 +105,10 @@ int main() {
                     for (int i = 0; i < measureTimeIterationCount; i++) {
                         cout << "Iteration number - " << i+1 << endl;
                         generateStudentFile(studentCount);
-                        generateStudentFileList(studentCount);
+                        
+                        if (measureList) {
+                            generateStudentFileList(studentCount);
+                        }
                         
                         cout << endl;
                     }
@@ -127,13 +133,15 @@ int main() {
                     milliseconds duration = calculateDuration(startTime);
                     cout << "(VECTOR) Full test time: " << duration.count() << " milliseconds." << endl << endl;
 
-                    startTime = high_resolution_clock::now();
+                    if (measureList) {
+                        startTime = high_resolution_clock::now();
 
-                    list<Student> studentsList = readGeneratedStudentsList(studentCount);
-                    splitOutputStudents(studentsList, studentCount);
+                        list<Student> studentsList = readGeneratedStudentsList(studentCount);
+                        splitOutputStudents(studentsList, studentCount);
 
-                    duration = calculateDuration(startTime);
-                    cout << "(LIST) Full test time: " << duration.count() << " milliseconds." << endl << endl << endl;
+                        duration = calculateDuration(startTime);
+                        cout << "(LIST) Full test time: " << duration.count() << " milliseconds." << endl << endl << endl;
+                    }
                 }
             } else {
                 vector<Student> students = readGeneratedStudents(studentCount);
@@ -154,13 +162,15 @@ int main() {
                         milliseconds duration = calculateDuration(startTime);
                         cout << "(VECTOR) Full test time: " << duration.count() << " milliseconds." << endl << endl;
 
-                        startTime = high_resolution_clock::now();
+                        if (measureList) {
+                            startTime = high_resolution_clock::now();
 
-                        list<Student> studentsList = readGeneratedStudentsList(studentCount);
-                        splitOutputStudents(studentsList, studentCount);
+                            list<Student> studentsList = readGeneratedStudentsList(studentCount);
+                            splitOutputStudents(studentsList, studentCount);
 
-                        duration = calculateDuration(startTime);
-                        cout << "(LIST) Full test time: " << duration.count() << " milliseconds." << endl << endl << endl;
+                            duration = calculateDuration(startTime);
+                            cout << "(LIST) Full test time: " << duration.count() << " milliseconds." << endl << endl << endl;
+                        }
                     }
                 } else {
                     vector<Student> students = readGeneratedStudents(studentCount);
