@@ -16,11 +16,14 @@ private:
     float finalMdn;
 
 public:
-    Student() {};
-    ~Student() {};
+    Student(){};
+    ~Student(){};
 
     Student(string, bool);
     Student(string, string);
+    
+    Student(const Student &other);
+    Student &operator=(const Student &other);
 
     void setNames(string, string);
     void setExamGrade(int);
