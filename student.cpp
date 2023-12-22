@@ -52,6 +52,14 @@ void Student::setNames(string name, string surname) {
     this->surname = surname;
 }
 
+void Student::setName(string name) {
+    this->name = name;
+}
+
+void Student::setSurname(string surname) {
+    this->surname = surname;
+}
+
 void Student::setExamGrade(int examGrade) {
     this->examGrade = examGrade;
 }

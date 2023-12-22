@@ -17,7 +17,9 @@ private:
 
 public:
     Student(){};
-    ~Student(){};
+    ~Student(){
+        cout << "Deconstructed " << name << endl;
+    };
 
     Student(string, bool);
     Student(string, string);
@@ -26,6 +28,8 @@ public:
     Student &operator=(const Student &other);
 
     void setNames(string, string);
+    void setName(string);
+    void setSurname(string);
     void setExamGrade(int);
     void addGrade(int);
 

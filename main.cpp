@@ -181,6 +181,7 @@ int main() {
 
         cout << "Copied via constructor student's name " << studentCopied.getName() << " , surname: " << studentCopied.getSurname() << " , avg - " << setprecision(2) << fixed << studentCopied.getAvg() << " , mdn - " << setprecision(2) << fixed << studentCopied.getMdn() << endl; 
 
+        studentCopied.setName("Vardas1");
         studentCopied.addGrade(10);
         studentCopied.addGrade(10);
         studentCopied.calculateAvg();
