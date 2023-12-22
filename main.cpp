@@ -165,6 +165,29 @@ int main() {
                 }
             }
         }
+    } else if (programMode == 4) { // demo student copy constructor and copy assignment operator
+        Student student = Student(string("Vardas"), string("Pavarde"));
+
+        student.addGrade(5);
+        student.addGrade(8);
+        student.addGrade(6);
+        student.setExamGrade(9);
+        student.calculateAvg();
+        student.calculateMdn();
+
+        cout << "Original student's name " << student.getName() << " , surname: " << student.getSurname() << " , avg - " << setprecision(2) << fixed << student.getAvg() << " , mdn - " << setprecision(2) << fixed << student.getMdn() << endl; 
+
+        Student studentCopied = Student(student);
+
+        cout << "Copied via constructor student's name " << studentCopied.getName() << " , surname: " << studentCopied.getSurname() << " , avg - " << setprecision(2) << fixed << studentCopied.getAvg() << " , mdn - " << setprecision(2) << fixed << studentCopied.getMdn() << endl; 
+
+        studentCopied.addGrade(10);
+        studentCopied.addGrade(10);
+        studentCopied.calculateAvg();
+        studentCopied.calculateMdn();
+
+        Student studentAssigned = studentCopied;
+
+        cout << "Copied via assignment student's name " << studentAssigned.getName() << " , surname: " << studentAssigned.getSurname() << " , avg - " << setprecision(2) << fixed << studentAssigned.getAvg() << " , mdn - " << setprecision(2) << fixed << studentAssigned.getMdn() << endl; 
     }
-    
 }
