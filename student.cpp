@@ -75,3 +75,11 @@ void Student::calculateMdn() {
 
     finalMdn = (medianGrade * gradesWeight) + (examGrade * examWeight);
 }
+
+bool compareByName(const Student& student1, const Student& student2) {
+    return student1.getName() < student2.getName();
+}
+
+bool compareByAvg(const Student& student1, const Student& student2) {
+    return student1.getAvg() < student2.getAvg();
+}
