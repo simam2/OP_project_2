@@ -30,18 +30,18 @@ int main() {
 
                 student = inputNameSurname(student, students.size());
 
-                if (student.name.empty()) {
+                if (student.getName().empty()) {
                     break;
                 }
 
                 if (gradeCount > -1) {
-                    student = generateGrades(student, gradeCount);
+                    student.generateRandomGrades(gradeCount);
                 } else {
                     student = inputGrades(student);
                 }
 
-                student = calculateAvg(student);
-                student = calculateMdn(student);
+                student.calculateAvg();
+                student.calculateMdn();
 
                 students.push_back(student);
                 cout << endl;
@@ -53,23 +53,10 @@ int main() {
             getline(file, line);
 
             while (getline(file, line)) {
-                Student student = Student();
+                Student student = Student(line, false);
 
-                istringstream splitString(line);
-
-                splitString >> student.name >> student.surname;
-
-                int grade;
-
-                while (splitString >> grade) {
-                    student.grades.push_back(grade);
-                }
-
-                student.grades.pop_back();
-                student.examGrade = grade;
-
-                student = calculateAvg(student);
-                student = calculateMdn(student);
+                student.calculateAvg();
+                student.calculateMdn();
 
                 students.push_back(student);
             }
