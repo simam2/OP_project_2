@@ -10,7 +10,7 @@
 #include <sstream>
 #include <chrono>
 
-#include "student.h"
+#include "student.cpp"
 #include "constants.h"
 
 using namespace std;
@@ -19,30 +19,33 @@ using namespace std::chrono;
 
 Student inputNameSurname(Student &student, int i) {
     int studentNumber = i + 1;
+    string name = "";
+    string surname = "";
 
     cin.ignore();
 
-    while (student.name.length() <= 0 || student.name.length() > maxNameLength) {
+    while (name.length() <= 0 || name.length() > maxNameLength) {
         cout << "Please enter the name of student number " << studentNumber << ": ";
-        getline(cin, student.name);
+        getline(cin, name);
 
-        if (student.name.empty()) {
+        if (name.empty()) {
             break;
         }
     }
 
-    if (student.name.empty()) {
+    if (name.empty()) {
         return student;
     }
 
-    while (student.surname.length() <= 0 || student.surname.length() > maxSurnameLength) {
-        cout << "Please enter the surname of student number " << studentNumber << " (name - " << student.name << "): ";
-        cin >> student.surname;
+    while (surname.length() <= 0 || surname.length() > maxSurnameLength) {
+        cout << "Please enter the surname of student number " << studentNumber << " (name - " << name << "): ";
+        cin >> surname;
     }
+
+    student.setNames(name, surname);
 
     return student;
 }
-
 
 Student inputGrades(Student &student) {
     int count = 1;
@@ -51,7 +54,7 @@ Student inputGrades(Student &student) {
     cin.ignore();
 
     while (true) {
-        cout << "Please enter grade " << count << " for student " << student.name << " " << student.surname << ": ";
+        cout << "Please enter grade " << count << " for student " << student.getName() << " " << student.getSurname() << ": ";
         getline(cin, input);
 
         if (input.empty()) {
@@ -61,7 +64,7 @@ Student inputGrades(Student &student) {
         try {
             if (stoi(input) >= 1 && stoi(input) <= 10) {
                 count++;
-                student.grades.push_back(stoi(input));
+                student.addGrade(stoi(input));
             } else {
                 cout << "You must enter a number between 1 and 10." << endl;
             }
@@ -70,17 +73,19 @@ Student inputGrades(Student &student) {
         }
     }
 
-    while (student.examGrade < 1 || student.examGrade > 10) {
-        cout << "Please enter the exam grade for student " << student.name << " " << student.surname << ": ";
+    int examGrade = 0;
+
+    while (examGrade < 1 || examGrade > 10) {
+        cout << "Please enter the exam grade for student " << student.getName() << " " << student.getSurname() << ": ";
         
         string input;
         cin >> input;
 
         try {
             if (stoi(input) >= 1 && stoi(input) <= 10) {
-                student.examGrade = stoi(input);
+                student.setExamGrade(stoi(input));
             } else {
-                student.examGrade = -1;
+                examGrade = -1;
                 cout << "You must enter a number between 1 and 10." << endl;
             }
         } catch (invalid_argument&) {
@@ -92,15 +97,7 @@ Student inputGrades(Student &student) {
 }
 
 Student generateGrades(Student &student, int gradeCount) {
-    random_device randomDevice;
-    mt19937 gen(randomDevice());
-    uniform_int_distribution<int> distribution(1, 10);
-
-    for (int i = 0; i < gradeCount; i++) {
-        student.grades.push_back(distribution(gen));
-    }
-
-    student.examGrade = distribution(gen);
+    student.generateRandomGrades(gradeCount);
 
     return student;
 }
@@ -164,37 +161,6 @@ int chooseGradeInputGen() {
     return gradeCount;
 }
 
-bool compareStudentNames(Student &left, Student &right) {
-    return left.name < right.name;
-}
-
-bool compareStudentFinalAvg(Student &left, Student &right) {
-    return left.finalAvg < right.finalAvg;
-}
-
-Student calculateAvg(Student &student) {
-    student.finalAvg = ((accumulate(student.grades.begin(), student.grades.end(), student.finalAvg) / student.grades.size()) * gradesWeight) + (student.examGrade * examWeight);
-    return student;
-}
-
-Student calculateMdn(Student &student) {
-    vector<int> sortedGrades = student.grades;
-    sort(sortedGrades.begin(), sortedGrades.end());
-    
-    int gradesCount = sortedGrades.size();
-    float medianGrade;
-
-    if (gradesCount % 2 == 0) {
-        medianGrade = (sortedGrades[(gradesCount / 2) - 1] + sortedGrades[gradesCount / 2]) / 2.0;
-    } else {
-        medianGrade = sortedGrades[gradesCount / 2];
-    }
-
-    student.finalMdn = (medianGrade * gradesWeight) + (student.examGrade * examWeight);
-
-    return student;
-}
-
 milliseconds calculateDuration(system_clock::time_point &startTime) {
     auto endTime = high_resolution_clock::now();
     duration<double> timeDiff = endTime - startTime;
@@ -207,7 +173,7 @@ milliseconds calculateDuration(system_clock::time_point &startTime) {
 void outputResults(vector<Student> &students, bool outputToTerminal, string fullFileName, bool printMdn, bool sortByName) {
     if (students.size() > 0) {
         if (sortByName) {
-            sort(students.begin(), students.end(), &compareStudentNames);
+            sort(students.begin(), students.end(), &compareByName);
         }
 
         if (outputToTerminal) {
@@ -226,15 +192,15 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
             
             for (Student student : students) {
                 string allGrades = "";
-                for (int grade : student.grades) {
+                for (int grade : student.getGrades()) {
                     allGrades += to_string(grade);
                     allGrades += " ";
                 }
 
-                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                cout << setw(maxSurnameLength) << student.getSurname() << setw(maxNameLength) << student.getName() << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.getAvg();
 
                 if (printMdn) {
-                    cout << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                    cout << setw(20) << setprecision(2) << fixed << student.getMdn() << endl;
                 } else {
                     cout << endl;
                 }
@@ -255,15 +221,15 @@ void outputResults(vector<Student> &students, bool outputToTerminal, string full
             
             for (Student student : students) {
                 string allGrades = "";
-                for (int grade : student.grades) {
+                for (int grade : student.getGrades()) {
                     allGrades += to_string(grade);
                     allGrades += " ";
                 }
 
-                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                file << setw(maxSurnameLength) << student.getSurname() << setw(maxNameLength) << student.getName() << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.getAvg();
 
                 if (printMdn) {
-                    file << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                    file << setw(20) << setprecision(2) << fixed << student.getMdn() << endl;
                 } else {
                     file << endl;
                 }
@@ -282,16 +248,14 @@ void generateStudentFile(int &studentCount) {
     for (int i = 1; i <= studentCount; i++) {
         Student student = Student();
 
-        student.name = generatedNamePrefix + to_string(i);
-        student.surname = generatedSurnamePrefix + to_string(i);
-
-        student = generateGrades(student, generatedGradeCount);
-        student = calculateAvg(student);
+        student.setNames(generatedNamePrefix + to_string(i), generatedSurnamePrefix + to_string(i));
+        student.generateRandomGrades(generatedGradeCount);
+        student.calculateAvg();
 
         students.push_back(student);
     }
 
-    sort(students.begin(), students.end(), &compareStudentFinalAvg);
+    sort(students.begin(), students.end(), &compareByAvg);
     outputResults(students, false, (inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt"), false, false);
 
     if (measureTime) {
@@ -317,21 +281,7 @@ vector<Student> readGeneratedStudents(int studentCount) {
     getline(file, line);
 
     while (getline(file, line)) {
-        Student student = Student();
-
-        istringstream splitString(line);
-
-        splitString >> student.name >> student.surname;
-
-        for (int i = 0; i < generatedGradeCount; i++) {
-            int grade;
-    
-            splitString >> grade;
-            student.grades.push_back(grade);
-        }
-
-        splitString >> student.finalAvg;
-
+        Student student = Student(line, true);
         students.push_back(student);
     }
 
@@ -354,7 +304,7 @@ void splitOutputStudents(vector<Student> &students, int studentCount) {
             vector<Student> students2;
 
             for (Student student : students) {
-                if (student.finalAvg < 5) {
+                if (student.getAvg() < 5) {
                     students1.push_back(student);
                 } else {
                     students2.push_back(student);
@@ -394,7 +344,7 @@ void splitOutputStudents(vector<Student> &students, int studentCount) {
                 int index = distance(students.begin(), it);
                 Student student = students.at(index);
                 
-                if (student.finalAvg < 5) {
+                if (student.getAvg() < 5) {
                     students1.push_back(student);
                     students.erase(it);
                 }
@@ -430,8 +380,8 @@ void splitOutputStudents(vector<Student> &students, int studentCount) {
             vector<Student> students1;
             vector<Student> students2;
 
-            remove_copy_if(students.begin(), students.end(), back_inserter(students1), [](Student &student) { return student.finalAvg >= 5; });
-            remove_copy_if(students.begin(), students.end(), back_inserter(students2), [](Student &student) { return student.finalAvg < 5; });
+            remove_copy_if(students.begin(), students.end(), back_inserter(students1), [](Student &student) { return student.getAvg() >= 5; });
+            remove_copy_if(students.begin(), students.end(), back_inserter(students2), [](Student &student) { return student.getAvg() < 5; });
 
             if (measureTime) {
                 milliseconds duration = calculateDuration(startTime);
@@ -466,7 +416,7 @@ void splitOutputStudents(vector<Student> &students, int studentCount) {
 void outputResults(list<Student> &students, bool outputToTerminal, string fullFileName, bool printMdn, bool sortByName) {
     if (students.size() > 0) {
         if (sortByName) {
-            students.sort(&compareStudentNames);
+            students.sort(&compareByName);
         }
 
         if (outputToTerminal) {
@@ -485,15 +435,15 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
             
             for (Student student : students) {
                 string allGrades = "";
-                for (int grade : student.grades) {
+                for (int grade : student.getGrades()) {
                     allGrades += to_string(grade);
                     allGrades += " ";
                 }
 
-                cout << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                cout << setw(maxSurnameLength) << student.getSurname() << setw(maxNameLength) << student.getName() << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.getAvg();
 
                 if (printMdn) {
-                    cout << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                    cout << setw(20) << setprecision(2) << fixed << student.getMdn() << endl;
                 } else {
                     cout << endl;
                 }
@@ -514,15 +464,15 @@ void outputResults(list<Student> &students, bool outputToTerminal, string fullFi
             
             for (Student student : students) {
                 string allGrades = "";
-                for (int grade : student.grades) {
+                for (int grade : student.getGrades()) {
                     allGrades += to_string(grade);
                     allGrades += " ";
                 }
 
-                file << setw(maxSurnameLength) << student.surname << setw(maxNameLength) << student.name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.finalAvg;
+                file << setw(maxSurnameLength) << student.getSurname() << setw(maxNameLength) << student.getName() << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << student.getAvg();
 
                 if (printMdn) {
-                    file << setw(20) << setprecision(2) << fixed << student.finalMdn << endl;
+                    file << setw(20) << setprecision(2) << fixed << student.getMdn() << endl;
                 } else {
                     file << endl;
                 }
@@ -539,18 +489,15 @@ void generateStudentFileList(int &studentCount) {
     auto startTime = high_resolution_clock::now();
 
     for (int i = 1; i <= studentCount; i++) {
-        Student student = Student();
+        Student student = Student(generatedNamePrefix + to_string(i), generatedSurnamePrefix + to_string(i));
 
-        student.name = generatedNamePrefix + to_string(i);
-        student.surname = generatedSurnamePrefix + to_string(i);
-
-        student = generateGrades(student, generatedGradeCount);
-        student = calculateAvg(student);
+        student.generateRandomGrades(generatedGradeCount);
+        student.calculateAvg();
 
         students.push_back(student);
     }
 
-    students.sort(&compareStudentFinalAvg);
+    students.sort(&compareByAvg);
     outputResults(students, false, (inputFolderName + "/" + generatedFilePrefix + to_string(studentCount) + ".txt"), false, false);
 
     if (measureTime) {
@@ -576,21 +523,7 @@ list<Student> readGeneratedStudentsList(int studentCount) {
     getline(file, line);
 
     while (getline(file, line)) {
-        Student student = Student();
-
-        istringstream splitString(line);
-
-        splitString >> student.name >> student.surname;
-
-        for (int i = 0; i < generatedGradeCount; i++) {
-            int grade;
-    
-            splitString >> grade;
-            student.grades.push_back(grade);
-        }
-
-        splitString >> student.finalAvg;
-
+        Student student = Student(line, true);
         students.push_back(student);
     }
 
@@ -611,7 +544,7 @@ void splitOutputStudents(list<Student> &students, int studentCount) {
     auto startTime = high_resolution_clock::now();
 
     for (Student student : students) {
-        if (student.finalAvg < 5) {
+        if (student.getAvg() < 5) {
             students1.push_back(student);
         } else {
             students2.push_back(student);
