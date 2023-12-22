@@ -16,13 +16,20 @@ private:
     float finalMdn;
 
 public:
-    Student() {};
-    ~Student() {};
+    Student(){};
+    ~Student(){
+        cout << "Deconstructed " << name << endl;
+    };
 
     Student(string, bool);
     Student(string, string);
+    
+    Student(const Student &other);
+    Student &operator=(const Student &other);
 
     void setNames(string, string);
+    void setName(string);
+    void setSurname(string);
     void setExamGrade(int);
     void addGrade(int);
 

@@ -105,8 +105,8 @@ Student generateGrades(Student &student, int gradeCount) {
 char chooseAction() {
     int userChoice = 0;
 
-    while (userChoice != 1 && userChoice != 2 && userChoice != 3) {
-        cout << "Please choose what you'd like the program to do - input '1' if you would like to input/process data, input '2' if you want random input files to be generated, input '3' if you would like a generated file to be processed: ";
+    while (userChoice != 1 && userChoice != 2 && userChoice != 3 && userChoice != 4) {
+        cout << "Please choose what you'd like the program to do - input '1' if you would like to input/process data, input '2' if you want random input files to be generated, input '3' if you would like a generated file to be processed, input '4' if you want to see a demo of student copy actions: ";
         cin >> userChoice;
         cout << endl;
     }

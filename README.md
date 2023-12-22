@@ -1,6 +1,9 @@
+
+  
+
 # OP project
 
-### v1.1
+### v1.2
 
 - Programa naudoja klasę duomenims saugoti:
 	-  *string* tipas: studento vardas ir pavardė;
@@ -11,8 +14,17 @@
 	-  **1 - v0.1** funkcionalumas
 	-  **2 - nuo v0.2** funkcionalumas - *1 dalis (generavimas)*
 	-  **3 - nuo v0.2** funkcionalumas - *2 dalis (apdorojimas)*
+	-  **4 - v1.2** funkcionalumas
 
 ---
+
+#### 4 funkcionalumas
+
+- Programa sukuria vieną studentą, prideda jam kelis pažymius, įrašo egzamino pažymį, apskaičiuoja galutinius vidurkį ir medianą, atspausdina šį studentą.
+- Padaro šio studento kopiją pasinaudojant kopijavimo konstruktoriumi, atspausdina šį studentą.
+- Prideda kelis naujus pažymius naujai nukopijuotam studentui, perskaičiuoja galutinius vidurkį ir medianą ir atspausdina šį studentą.
+
+![](https://raw.githubusercontent.com/simam2/OP_project_2/v1.2/screenshots/1.2.png)
 
 #### 2, 3 funkcionalumai
 - Programa leidžia ranka įvesti studentų skaičių kuriam turėtų būti sugeneruotas (arba buvo sugeneruotas) failas (jeigu konstantų faile nėra nurodytas failų sąrašas).
@@ -28,7 +40,7 @@ Abiems funkcionalumams yra skaičiuojama kiek laiko užtruko jų atskiri veiksma
 | 10000 | 0.3074 / 0.1572 | 2.1812 / 2.482 |
 | 100000 | 8.772 / 1.1104 | 54.0448 / 22.224 |
 
-v1.1 versijoje taip pat atlikti greitaveikos ir optimizacijos testai naudojant skirtingus optimizavimo flag'us. Žemiau pateikiama lentelė su studentų skirstymo trukmėmis sekundėmis ir .exe failo dydžiais (pirmas skaičius - Class, antras - Struct).
+v1.1 versijoje taip pat atlikti greitaveikos ir optimizacijos testai naudojant skirtingus optimizavimo flag'us. Žemiau pateikiama lentelė su studentų skirstymo trukmėmis ir .exe failo dydžiais (pirmas skaičius - Class, antras - Struct).
 
 | Flag | .exe dydis (MB) | 1000 | 10000 | 100000 |
 | -- | -- | -- | -- | -- |
