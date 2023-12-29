@@ -5,11 +5,26 @@
 
 using namespace std;
 
-class Student
+class Person
 {
-private:
+protected:
     string name;
     string surname;
+
+public:
+    virtual ~Person(){};
+
+    virtual void setNames(string, string) = 0;
+    virtual void setName(string) = 0;
+    virtual void setSurname(string) = 0;
+
+    inline string getName() const { return name; }
+    inline string getSurname() const { return surname; }
+};
+
+class Student : public Person
+{
+private:
     vector<int> grades;
     int examGrade;
     float finalAvg;
@@ -17,13 +32,14 @@ private:
 
 public:
     Student(){};
-    ~Student(){
-        cout << "Deconstructed " << name << endl;
+    ~Student()
+    {
+        cout << "Deconstructed " << getName() << endl;
     };
 
     Student(string, bool);
     Student(string, string);
-    
+
     Student(const Student &other);
     Student &operator=(const Student &other);
 
@@ -36,17 +52,15 @@ public:
     void generateRandomGrades(int);
     void calculateAvg();
     void calculateMdn();
-    
-    void printToTerminal(bool);
-    void printToFile(ofstream&, bool);
 
-    inline string getName() const { return name; }
-    inline string getSurname() const { return surname; }
+    void printToTerminal(bool);
+    void printToFile(ofstream &, bool);
+
     inline vector<int> getGrades() const { return grades; }
     inline int getExamGrade() const { return examGrade; }
     inline float getAvg() const { return finalAvg; }
     inline float getMdn() const { return finalMdn; }
 };
 
-bool compareByName(const Student&, const Student&);
-bool compareByAvg(const Student&, const Student&);
+bool compareByName(const Student &, const Student &);
+bool compareByAvg(const Student &, const Student &);
