@@ -36,6 +36,9 @@ public:
     void generateRandomGrades(int);
     void calculateAvg();
     void calculateMdn();
+    
+    void printToTerminal(bool);
+    void printToFile(ofstream&, bool);
 
     inline string getName() const { return name; }
     inline string getSurname() const { return surname; }
