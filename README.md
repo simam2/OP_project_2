@@ -3,10 +3,10 @@
 
 # OP project
 
-### v1.2
+### v1.5
 
-- Programa naudoja klasę duomenims saugoti:
-	-  *string* tipas: studento vardas ir pavardė;
+- Programa naudoja klasę duomenims saugoti (Person - abstrakti klasė, Student - išvestinė Person klasė):
+	-  *string* tipas: studento vardas ir pavardė (saugoma bazinėje klasėje);
 	-  *vector (int)* tipo konteineris: namų darbų tarpiniai rezultatai;
 	-  *int* tipas: egzamino rezultatas;
 	-  *float* tipas: galutiniai balai skaičiuojant vidurkį arba medianą.
