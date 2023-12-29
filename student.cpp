@@ -100,6 +100,38 @@ void Student::calculateMdn() {
     finalMdn = (medianGrade * gradesWeight) + (examGrade * examWeight);
 }
 
+void Student::printToTerminal(bool printMdn) {
+    string allGrades = "";
+    for (int grade : grades) {
+        allGrades += to_string(grade);
+        allGrades += " ";
+    }
+
+    cout << setw(maxSurnameLength) << surname << setw(maxNameLength) << name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << finalAvg;
+
+    if (printMdn) {
+        cout << setw(20) << setprecision(2) << fixed << finalMdn << endl;
+    } else {
+        cout << endl;
+    }
+}
+
+void Student::printToFile(ofstream& file, bool printMdn) {
+    string allGrades = "";
+    for (int grade : grades) {
+        allGrades += to_string(grade);
+        allGrades += " ";
+    }
+
+    file << setw(maxSurnameLength) << surname << setw(maxNameLength) << name << setw(32) << allGrades << setw(20) << setprecision(2) << fixed << finalAvg;
+
+    if (printMdn) {
+        file << setw(20) << setprecision(2) << fixed << finalMdn << endl;
+    } else {
+        file << endl;
+    }
+}
+
 bool compareByName(const Student& student1, const Student& student2) {
     return student1.getName() < student2.getName();
 }
