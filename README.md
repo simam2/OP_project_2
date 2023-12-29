@@ -1,9 +1,6 @@
-
-  
-
 # OP project
 
-### v1.5
+### v2.0
 
 - Programa naudoja klasę duomenims saugoti (Person - abstrakti klasė, Student - išvestinė Person klasė):
 	-  *string* tipas: studento vardas ir pavardė (saugoma bazinėje klasėje);
@@ -15,6 +12,8 @@
 	-  **2 - nuo v0.2** funkcionalumas - *1 dalis (generavimas)*
 	-  **3 - nuo v0.2** funkcionalumas - *2 dalis (apdorojimas)*
 	-  **4 - v1.2** funkcionalumas
+- /docs aplankale galima rasti Doxygen sugeneruotą dokumentaciją HTML formatu.
+- test.cpp - Unit testų failas
 
 ---
 
