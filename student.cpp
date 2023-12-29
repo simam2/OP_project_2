@@ -31,7 +31,12 @@ Student::Student(string name, string surname) {
     setNames(name, surname);
 }
 
-Student::Student(const Student& other) : name(other.name), surname(other.surname), grades(other.grades), examGrade(other.examGrade), finalAvg(other.finalAvg), finalMdn(other.finalMdn) {}
+Student::Student(const Student& other) : Student(other.name, other.surname) {
+    grades = other.grades;
+    examGrade = other.examGrade;
+    finalAvg = other.finalAvg;
+    finalMdn = other.finalMdn;
+}
 
 Student& Student::operator=(const Student& other)
 {
